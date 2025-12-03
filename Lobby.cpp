@@ -8,12 +8,10 @@
 using namespace std;
 
 int maximize(const string cad, int i, int j, vector<vector<int>> &mem ){
-    if (mem[i][j] != -1) mem[i][j];
-    else if (i > cad.length() || j > cad.length() || i > j) return 0;
+    if (i >= cad.length() || j >= cad.length() || i > j) return 0;
+    else if (mem[i][j] != -1) mem[i][j];
     else {
-        string aux;
-        aux[0]=cad[i];
-        aux[1]=cad[j];
+        string aux = {cad[i],cad[j]};
         mem[i][j] = max(max( stoi(aux) , maximize(cad,i+1,j,mem) ) , max(maximize(cad,i,j+1,mem),maximize(cad,i+1,j+1,mem)));
     }
     return mem[i][j];
