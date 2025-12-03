@@ -22,8 +22,11 @@ int maximize(const string cad, int i, int j, vector<vector<int>> &mem ){
 int main(){
     ifstream input("input.txt");
     string cad;
+    int sum=0;
     while(getline(input,cad)){
-
+        vector<vector<int>>(cad.size(),vector<int>(cad.size(),-1)); //inicialización de la matriz de memoria a -1
+        sum+= maximize(cad,0,1,mem);
     }
+    cout<<sum<<endl;
     return 0;
 }
