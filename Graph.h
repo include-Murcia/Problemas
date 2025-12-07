@@ -13,43 +13,65 @@ class Graph {
 
         Graph(){
             n=0;
+            graph = new ListLinked<GraphNode*>;
+        }
+        ~Graph(){
+        for (int i = 0; i < graph->size(); ++i) {
+            delete graph->get(i);
+        }
+        delete graph;
+
         }
         void insertNode(int id,ListLinked<GraphNode*> *vecinos = nullptr){
             GraphNode* nodo;
-            if (search(id)->id != -1)
-                {
+            if (search(id) != nullptr) {
+                throw std::runtime_error("El nodo ya existe en el grafo");
+            }
+            if(vecinos != nullptr)
+                nodo = new GraphNode (id,vecinos);
+            else
+                nodo = new GraphNode(id);
+            graph->prepend(nodo);
+            n++;
                 
-                if(vecinos != nullptr)
-                    nodo = new GraphNode (id,vecinos);
-                else
-                    nodo = new GraphNode(id);
-                    
-                graph->prepend(nodo);
-                n++;
-                }
-            else throw std::runtime_error("Nodo con esa id ya existente en el grafo");    
+        }
+        void addEdge(int idA, int idB,bool dirigido = false){
+            GraphNode* A = search(idA);
+            GraphNode* B = search(idB);
+
+            if(A == nullptr || B == nullptr) throw std::runtime_error("Alguno de los nodos no existe");
+            if (!(A->tieneVecino(idB))) A->annyairVecino(B);
+            if (!(B->tieneVecino(idA)) && !dirigido) B->annyairVecino(A); //solo añade A a B si no es dirigido
+
         }
         void removeNode(int id){
-            GraphNode* aux;
-                for(int i=0; i<n; i++){
-                    if ((graph->get(i)->id) == id)
-                    for (int j=0; j<( graph->get(i)->vecinos->size() );j++){
-                         aux = graph->get(i)->vecinos->get(j)->eliminarVecino(id);
-                    }
+        if (search(id) == nullptr)  throw std::out_of_range("Nodo no existe");
+        for (int i = 0; i < graph->size(); ++i) { //Primero eliminas el nodo en las listas de vecinos
+            GraphNode* aux = graph->get(i);
+            for (int j = 0; j < aux->vecinos->size();j++) { //Buscas hasta que encuentras el nodo
+                if (aux->vecinos->get(j)->id == id) {
+                    aux->vecinos->remove(j);
+                    break;
                 }
-                n--;
-                delete aux;
+            }
+        }
+
+        // Eliminas el nodo del grafo ahora que ya no es vecino de nadie
+        for (int i = 0; i < graph->size(); ++i) {
+            if (graph->get(i)->id == id) {
+                GraphNode* toDelete = graph->remove(i);
+                --n;
+                delete toDelete;
+                break;
+            }
+        }
 
         }
         GraphNode* search(int id){
-            if (n > 0)
-                for(int i = 0; i<n; i++){
-                    if((graph->get(i)->id) == id) {
-                        return new GraphNode(id,graph->get(i)->vecinos);
-                    }
-                }
-            new GraphNode(-1);
-            return new GraphNode(-1);
+            for (int i = 0; i < graph->size(); ++i) {
+                if (graph->get(i)->id == id) return graph->get(i);
+            }
+            return nullptr;
         }
 
         void print(){

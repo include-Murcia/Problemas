@@ -8,32 +8,42 @@ class GraphNode {
     public:
         int id;
         ListLinked<GraphNode*> *vecinos;
-        int cantidad_vecinos;
 
         GraphNode(int _id){
             id = _id;
-            cantidad_vecinos = 0;
+            vecinos = new ListLinked<GraphNode*>;
         }
         GraphNode(int _id, ListLinked<GraphNode*> *_vecinos ){
             id = _id;
             vecinos = _vecinos;
-            cantidad_vecinos = vecinos->size();
         }
-        void annyairVecino(int id){
-            GraphNode* vecino = new GraphNode(id);
-            vecinos->prepend(vecino);
-            cantidad_vecinos++;
+        ~GraphNode(){
+            delete vecinos;
+        }
+    
+        bool tieneVecino(int id) const {
+            for (int i = 0; i < vecinos->size(); ++i)
+                if (vecinos->get(i)->id == id) return true;
+            return false;
+        }
+
+        void annyairVecino(GraphNode* vecino){
+            if (!tieneVecino(vecino->id)) //comprueba si el vecino ya existe
+                vecinos->prepend(vecino);
+            else throw std::runtime_error("Veicno ya es vecino del nodo");
         }
         GraphNode* eliminarVecino(int id){
-            GraphNode* vecino = new GraphNode(id);
-            int iter = vecinos->search(vecino);
-            if (iter!=-1){
-                GraphNode* eliminado = vecinos->remove(iter);
-                cantidad_vecinos--;
-                return eliminado;
+        for (int i = 0; i < vecinos->size(); ++i) {
+            if (vecinos->get(i)->id == id) {
+                return vecinos->remove(i);
             }
-            else throw std::out_of_range("Vecino no existe");
-            
+        }
+        throw std::out_of_range("Vecino no existe");
+
+        }
+
+        int cantidad_vecinos(){
+            return vecinos->size();
         }
 
 
